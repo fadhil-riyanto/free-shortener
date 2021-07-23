@@ -21,23 +21,27 @@ async def shorten(url: str):
     }, data={
         "url": url
     })
+    statuscode = response_2.status
+    if statuscode == int(429):
+        return "floodwait"
+    else:
 
-    context = loads(await response_2.text())
-    await session.close()
+        context = loads(await response_2.text())
+        await session.close()
 
-    return {
-        "url": "https://s.id/" + context["short"],
-        "created": {
-            "date": context["created_at"]["date"],
-            "timezone": context["created_at"]["timezone"]
-        },
-        "original": context["long_url"]
-    }
+        return {
+            "url": "https://s.id/" + context["short"],
+            "created": {
+                "date": context["created_at"]["date"],
+                "timezone": context["created_at"]["timezone"]
+            },
+            "original": context["long_url"]
+        }
     
+for a in range(1, 1000):
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+    loop = asyncio.get_event_loop()
+    val = loop.run_until_complete(shorten("https://blog.thehanifs.tech"))
+    loop.close()
 
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-loop = asyncio.get_event_loop()
-val = loop.run_until_complete(shorten("https://blog.thehanifs.tech"))
-loop.close()
-
-print(val)
+    print(val)
